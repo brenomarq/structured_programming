@@ -1,49 +1,60 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX 50
+typedef struct Contato Contato; // Definição parcial
+struct Contato {
+  int id; // Propriedade adicionada para auxiliar em algumas operações
+  char nome[50];
+  char telefone[15];
+  char email[50];
+  Contato* proximo;
+};
 
 typedef struct {
-  char nome[MAX]; // Nome pode ter 50 caracteres
-  char telefone[MAX - 35]; // Telefone pode ter 15 caracteres
-  char email[MAX]; // email pode ter 50 caracteres
-} Contato;
+  Contato *primeiro;
+} Lista;
 
-/*Essa função adiciona um contato na posição especificada da lista e retorna 1
-em caso de sucesso, 0 em caso de falha.*/
-int adicionar_contato(Contato contatos[], int pos_atual);
+/*Essa função é responsável por criar uma nova entidade de contato e retorna
+um ponteiro como resultado.*/
+Contato *criar_contato(void);
+
+/*Essa função adiciona um novo contato na última posição livre da lista
+de contatos.*/
+void adicionar_contato(Contato* contato, Lista* Lista);
+
+/*Essa função limpa o espaço ocupado por todos os contatos criados.*/
+void limpar_contatos(Lista* lista);
 
 int main() {
-  Contato contatos[MAX];
-  int entrada, result, pos_atual = 0;
+  int entrada;
+  Lista* contatos = (Lista*) malloc(sizeof(Lista)); // Cria lista de contatos
+  contatos->primeiro = NULL; // A lista começa vazia sem nenhum contato
+  Contato* novo_contato; // Armazena cada novo contato temporariamente
 
   do {
     printf("LISTA DE CONTATOS\n");
-    printf("Gerenciamos seus contatos com eficiência.\n");
-    printf("------------------------------------------\n");
-    printf("\nDigite uma das opções abaixo:\n");
+    printf("Gerenciamos seus contatos com eficiência\n");
+    printf("--------------------------------------------\n");
+    printf("Digite uma das opções abaixo\n");
     printf("[1] adicionar [2] remover [3] buscar [4] listar todos: ");
     scanf("%d", &entrada);
-    getchar();
+    getchar(); // Evitar comportamentos indesejados no console
 
     switch (entrada) {
-      case 1: // Incluir lógica de adição de contato
-        result = adicionar_contato(contatos, pos_atual);
+      case 1: // Opção de adicionar elemento
+        novo_contato = criar_contato();
+        adicionar_contato(novo_contato, contatos);
 
-        if (result) {
-          pos_atual++; // Avança para uma posição vazia na lista
-          printf("\nContato adicionado com sucesso!\n");
-        }
-
+        printf("\nContato adicionado com sucesso!\n");
         break;
 
-      case 2: // Incluir lógica de remoção de contato
+      case 2: // Opção de remover elemento
         break;
 
-      case 3: // Incluir lógica de busca
+      case 3:
         break;
 
-      case 4: // Incluir lógica para listar todos os contatos
+      case 4:
         break;
 
       default:
@@ -52,29 +63,59 @@ int main() {
     }
 
     printf("\nVocê deseja continuar o programa?\n");
-    printf("Digite [0], caso deseje finalizar: ");
+    printf("Digite [0] para finalizar: ");
     scanf("%d", &entrada);
     system("clear");
   } while (entrada != 0);
 
+  limpar_contatos(contatos);
   printf("PROGRAMA FINALIZADO!\n");
+};
 
-  return 0;
-}
-
-int adicionar_contato(Contato contatos[], int pos_atual) {
-  int successful = 0;
+Contato *criar_contato() {
+  Contato* novo_contato = (Contato*) malloc(sizeof(Contato));
+  novo_contato->proximo = NULL;
 
   system("clear");
-  printf("Adicionar Contato:\n");
+  printf("Adicionar Contato\n");
   printf("--------------------\n");
   printf("Digite o nome: ");
-  fgets(contatos[pos_atual].nome, sizeof(contatos[pos_atual].nome), stdin);
+  fgets(novo_contato->nome, sizeof(novo_contato->nome), stdin);
   printf("Digite o telefone: ");
-  fgets(contatos[pos_atual].telefone, sizeof(contatos[pos_atual].telefone), stdin);
+  fgets(novo_contato->telefone, sizeof(novo_contato->telefone), stdin);
   printf("Digite o email: ");
-  fgets(contatos[pos_atual].email, sizeof(contatos[pos_atual].email), stdin);
+  fgets(novo_contato->email, sizeof(novo_contato->email), stdin);
 
-  successful = 1; // Confirma que a operação foi bem sucedida
-  return successful;
+  return novo_contato;
+}
+
+void adicionar_contato(Contato* contato, Lista* lista) {
+  Contato* atual = lista->primeiro;
+
+  // Se o primeiro elemento é nulo, adiciona ali
+  if (lista->primeiro == NULL) {
+    lista->primeiro = contato;
+    return;
+  }
+
+  while (atual->proximo != NULL) {
+    atual = atual->proximo; // Percorre os contatos até encontrar um espaço
+  }
+
+  atual->proximo = contato; // Conecta o último contato criado ao último adicionado
+}
+
+void limpar_contatos(Lista* lista) {
+  Contato* atual = lista->primeiro;
+  Contato* temp;
+
+  if (atual == NULL) return; // Lista vazia não precisa limpar
+
+  while (atual != NULL) {
+    temp = atual->proximo; // Armazena temporariamente o próximo contato
+    free(atual); // Limpa o contato
+    atual = temp; // Visita o próximo elemento
+  }
+
+  free(lista); // Por fim limpa o espaço da lista;
 }
