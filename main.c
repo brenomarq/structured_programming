@@ -31,6 +31,13 @@ void adicionar_contato(Contato* contato, Lista* Lista);
 Ela retorna 1 em caso de sucesso, e 0 em caso de falha na busca.*/
 int remover_contato(int id, Lista* lista);
 
+/*Essa função lista e imprime todos os contatos adicionados.*/
+void listar_contatos(Lista* lista);
+
+/*Essa função imprime o contato especificado de maneira formatada e agradável
+ao usuário do sistema.*/
+void imprimir_contato(Contato* contato);
+
 /*Essa função limpa o espaço ocupado por todos os contatos criados.*/
 void limpar_contatos(Lista* lista);
 
@@ -74,6 +81,10 @@ int main() {
         break;
 
       case 4: // Opção para listar todos os contatos
+        system("clear");
+        printf("MEUS CONTATOS\n");
+        printf("--------------\n");
+        listar_contatos(contatos);
         break;
 
       default:
@@ -153,6 +164,28 @@ int remover_contato(int id, Lista* lista) {
   }
 
   return 0; // O elemento não foi encontrado
+}
+
+void listar_contatos(Lista* lista) {
+  Contato* atual = lista->primeiro;
+
+  if (atual == NULL) {
+    printf("\nA lista está vazia sem contatos!\n");
+    return;
+  }
+
+  while (atual != NULL) {
+    imprimir_contato(atual);
+    atual = atual->proximo;
+  }
+}
+
+void imprimir_contato(Contato* contato) {
+  printf("Contato de ID [%d]\n", contato->id);
+  printf("--------------------\n");
+  printf("Nome: %s", contato->nome);
+  printf("Telefone: %s", contato->telefone);
+  printf("Email: %s\n", contato->email);
 }
 
 void limpar_contatos(Lista* lista) {
