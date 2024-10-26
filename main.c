@@ -16,7 +16,7 @@ struct Contato {
 };
 
 typedef struct {
-  Contato *primeiro;
+  Contato* primeiro;
 } Lista;
 
 /*Essa função é responsável por criar uma nova entidade de contato com um ID
@@ -30,6 +30,10 @@ void adicionar_contato(Contato* contato, Lista* Lista);
 /*Essa função remove o contato da lista de contatos por meio do ID único.
 Ela retorna 1 em caso de sucesso, e 0 em caso de falha na busca.*/
 int remover_contato(int id, Lista* lista);
+
+/*Essa função busca um contato pelo ID especificado e retorna
+um ponteiro para aquele contato.*/
+Contato *buscar_contato(int id, Lista* lista);
 
 /*Essa função lista e imprime todos os contatos adicionados.*/
 void listar_contatos(Lista* lista);
@@ -45,7 +49,7 @@ int main() {
   int entrada, pos_atual = 1;
   Lista* contatos = (Lista*) malloc(sizeof(Lista)); // Cria lista de contatos
   contatos->primeiro = NULL; // A lista começa vazia sem nenhum contato
-  Contato* novo_contato; // Armazena cada novo contato temporariamente
+  Contato* contato_temp; // Armazena cada novo contato temporariamente
 
   do {
     printf("LISTA DE CONTATOS\n");
@@ -58,8 +62,8 @@ int main() {
 
     switch (entrada) {
       case 1: // Opção de adicionar elemento
-        novo_contato = criar_contato(&pos_atual);
-        adicionar_contato(novo_contato, contatos);
+        contato_temp = criar_contato(&pos_atual);
+        adicionar_contato(contato_temp, contatos);
 
         printf("\nContato adicionado com sucesso!\n");
         break;
@@ -78,6 +82,17 @@ int main() {
         break;
 
       case 3: // Opção de buscar elementos
+        system("clear");
+        printf("Digite o ID do contato: ");
+        scanf("%d", &entrada);
+        getchar();
+
+        contato_temp = buscar_contato(entrada, contatos);
+        if (contato_temp == NULL) {
+          printf("\nO contato não foi encontrado!\n");
+        } else {
+          imprimir_contato(contato_temp);
+        }
         break;
 
       case 4: // Opção para listar todos os contatos
@@ -164,6 +179,20 @@ int remover_contato(int id, Lista* lista) {
   }
 
   return 0; // O elemento não foi encontrado
+}
+
+Contato *buscar_contato(int id, Lista* lista) {
+  Contato* atual = lista->primeiro;
+
+  while (atual != NULL) {
+    if (atual->id == id) {
+      return atual; // Contato encontrado e retornado com sucesso
+    }
+
+    atual = atual->proximo; // Visita o próximo contato
+  }
+
+  return atual; // Contato não encontrado, logo retorna NULL
 }
 
 void listar_contatos(Lista* lista) {
