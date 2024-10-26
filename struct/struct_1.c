@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 typedef struct {
     char titulo[50];
     char autor[50];
@@ -14,7 +13,7 @@ int main() {
         printf("Digite os dados do livro: \n");
         printf("Titulo: ");
         fgets(livros[i].titulo, sizeof(livros[i].titulo), stdin);
-        
+
         printf("Autor: ");
         fgets(livros[i].autor, sizeof(livros[i].autor), stdin);
 
