@@ -1,3 +1,8 @@
+/*
+  Desafio de Struct
+  Criar um programa que receba contatos do usuário e realize as funções de
+adicionar, remover, buscar e listar todos os contatos adicionados.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,19 +19,23 @@ typedef struct {
   Contato *primeiro;
 } Lista;
 
-/*Essa função é responsável por criar uma nova entidade de contato e retorna
-um ponteiro como resultado.*/
-Contato *criar_contato(void);
+/*Essa função é responsável por criar uma nova entidade de contato com um ID
+único e retorna um ponteiro para essa entidade.*/
+Contato *criar_contato(int* pos_atual);
 
 /*Essa função adiciona um novo contato na última posição livre da lista
 de contatos.*/
 void adicionar_contato(Contato* contato, Lista* Lista);
 
+/*Essa função remove o contato da lista de contatos por meio do ID único.
+Ela retorna 1 em caso de sucesso, e 0 em caso de falha na busca.*/
+int remover_contato(int id, Lista* lista);
+
 /*Essa função limpa o espaço ocupado por todos os contatos criados.*/
 void limpar_contatos(Lista* lista);
 
 int main() {
-  int entrada;
+  int entrada, pos_atual = 1;
   Lista* contatos = (Lista*) malloc(sizeof(Lista)); // Cria lista de contatos
   contatos->primeiro = NULL; // A lista começa vazia sem nenhum contato
   Contato* novo_contato; // Armazena cada novo contato temporariamente
@@ -42,19 +51,29 @@ int main() {
 
     switch (entrada) {
       case 1: // Opção de adicionar elemento
-        novo_contato = criar_contato();
+        novo_contato = criar_contato(&pos_atual);
         adicionar_contato(novo_contato, contatos);
 
         printf("\nContato adicionado com sucesso!\n");
         break;
 
       case 2: // Opção de remover elemento
+        system("clear");
+        printf("Digite o ID do contato a ser removido: ");
+        scanf("%d", &entrada);
+        getchar();
+
+        if (remover_contato(entrada, contatos)) {
+          printf("\nContato de ID [%d] removido com sucesso!\n", entrada);
+        } else {
+          printf("\nContato não encontrado na lista!\n");
+        }
         break;
 
-      case 3:
+      case 3: // Opção de buscar elementos
         break;
 
-      case 4:
+      case 4: // Opção para listar todos os contatos
         break;
 
       default:
@@ -72,9 +91,10 @@ int main() {
   printf("PROGRAMA FINALIZADO!\n");
 };
 
-Contato *criar_contato() {
+Contato *criar_contato(int* pos_atual) {
   Contato* novo_contato = (Contato*) malloc(sizeof(Contato));
-  novo_contato->proximo = NULL;
+  novo_contato->proximo = NULL; // Atribui um valor nulo ao próximo contato
+  novo_contato->id = *pos_atual; // Atribui um ID único a cada contato
 
   system("clear");
   printf("Adicionar Contato\n");
@@ -86,6 +106,7 @@ Contato *criar_contato() {
   printf("Digite o email: ");
   fgets(novo_contato->email, sizeof(novo_contato->email), stdin);
 
+  (*pos_atual)++; // Modifica a variável para identificar outros contatos
   return novo_contato;
 }
 
@@ -103,6 +124,35 @@ void adicionar_contato(Contato* contato, Lista* lista) {
   }
 
   atual->proximo = contato; // Conecta o último contato criado ao último adicionado
+}
+
+int remover_contato(int id, Lista* lista) {
+  Contato* anterior, *temp; // Definem-se variáveis temporárias de armazenamento
+  Contato* atual = lista->primeiro; // Define o atual como o primeiro da lista
+
+  if (atual->id == id) {
+    // Executa se o ID corresponde ao primeiro elemento da lista
+    temp = atual->proximo;
+    free(atual);
+    lista->primeiro = temp;
+
+    return 1; // Operação realizada com sucesso
+  }
+
+  while (atual != NULL) {
+    if (atual->id == id) {
+      temp = atual->proximo; // Armazena o próximo elemento associado
+      free(atual); // Remove o elemento selecionado
+      anterior->proximo = temp; // Associa o próximo do elemento removido
+
+      return 1; // Elemento encontrado e removido
+    }
+
+    anterior = atual;
+    atual = atual->proximo; // Passa para o próximo contato
+  }
+
+  return 0; // O elemento não foi encontrado
 }
 
 void limpar_contatos(Lista* lista) {
